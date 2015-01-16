@@ -91,3 +91,9 @@ You can monitor messages from board over picocom or putty using ttyS or ttyUSB, 
 
 sudo picocom -b 38400 -r -l /dev/ttyUSB0
 
+
+update: 
+
+on other apk on github working with lbs
+
+https://github.com/foldedtoad/blelbservice
