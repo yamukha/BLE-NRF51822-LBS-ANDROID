@@ -15,9 +15,13 @@ Software
 - LED&button service example (lbs) from nAN36 of Nordic
 
 used code with modification from:
+
 https://github.com/finnurtorfa/nrf51
+
 https://github.com/microbuilder/IntroToBLE/tree/master/TestApplicationAccelerator
+
 https://github.com/hlnd/nrf51-pure-gcc-setup
+
 https://github.com/NordicSemiconductor/nrf51-ble-app-lbs
 
 
@@ -84,5 +88,6 @@ Logging:
 
 To lbs nrf project added simple uart functions to log over serial port. 
 You can monitor messages from board over picocom or putty using ttyS or ttyUSB, i.e.: 
+
 sudo picocom -b 38400 -r -l /dev/ttyUSB0
 
