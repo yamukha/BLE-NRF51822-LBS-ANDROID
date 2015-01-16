@@ -39,11 +39,14 @@ There are two parts:
 1) embedded crosscompiling and flashing to nRF51822
 
 in Linux PC at home folder create new folder Project
+
 ~/Project
+
 clone to it code from github, there are 3 folders: AndroidBLElbs  nrf51  nrf51-pure-gcc-setup
 - AndroidBLElbs: Android Eclipse project
 - nfr51: SDK for SoC
 - nrf51-pure-gcc-setup : with gcc make and flash scripts as well as with lbs code
+
 If you can not compile and build bls project than check nrf51-pure-gcc-setup scripts and makefiles.
 There can by issues of different version of SDK and folder structure. 
 Project uses version 4.2 of the SDK.
@@ -54,13 +57,17 @@ Vref of Jlink connect to +3v3 by 10KOm pull up resistor.
 
 Compiling:
 cd ~/Projects/nrf51-pure-gcc-setup/examples/pca10001/lbs/pure_gcc
+
 make
 
 Copy bin file
+
 cp _build/app_s110.bin ../../../../template/_build/app_s110.bin
 
 Flashing:
+
 cd ../../../../template
+
 make flash-softdevice SOFTDEVICE=s110_nrf51822_5.1.0_softdevice.hex
 
 2) building Android apk
