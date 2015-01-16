@@ -94,6 +94,6 @@ sudo picocom -b 38400 -r -l /dev/ttyUSB0
 
 update: 
 
-on other apk on github working with lbs
+one other Android apk on github working with lbs:
 
 https://github.com/foldedtoad/blelbservice
