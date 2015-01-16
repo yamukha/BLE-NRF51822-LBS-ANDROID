@@ -1,16 +1,16 @@
 # BLE-NRF51822-LBS-ANDROID
 by yamukha@ukr.net
 
-Project for nrfRF51822 custom board communicating over Bluetooth Smart (BLE 4.0) with Android. 
+Project for nRF51822 custom board communicating over Bluetooth Smart (BLE 4.0) with Android. 
 It combines several different projects into one bundle.
 
 Project task: 
 - provide low cost initial development toolchain for of Bluetoooth Low Energy system 
 
 Project base:
-Sofware
+Software
 - Nordic SDK and Software Device 5.1.0 (old one while code is published on github).
-- pure gcc for nRF52811 (for Linux platform)
+- pure gcc for nRF51822 (for Linux platform)
 - Android example from book "Getting Started with Bluetooth Low Energy"
 - LED&button service example (lbs) from nAN36 of Nordic
 
@@ -22,7 +22,7 @@ https://github.com/NordicSemiconductor/nrf51-ble-app-lbs
 
 
 Hardware:
-- noname nRF51822 board from Aliexpres (with redefined pin for LED and button): - $15
+- noname nRF51822 board from Aliexpress (with redefined pin for LED and button): - $15
 - JLink from Aliexpress: - $13 
 - Android device with BLE support (tested on LG L90)
 - Linux PC (i.e. Ubuntu)
@@ -36,7 +36,7 @@ There are two parts:
 - embedded part:  nrfRF51822 custom board, can be any board with properly defined input-output lines
 - Android based client
 
-1) embedded crosscompiling and flashing to nRf51822
+1) embedded crosscompiling and flashing to nRF51822
 
 in Linux PC at home folder create new folder Project
 ~/Project
@@ -45,12 +45,12 @@ clone to it code from github, there are 3 folders: AndroidBLElbs  nrf51  nrf51-p
 - nfr51: SDK for SoC
 - nrf51-pure-gcc-setup : with gcc make and flash scripts as well as with lbs code
 If you can not compile and build bls project than check nrf51-pure-gcc-setup scripts and makefiles.
-There can by issues of different version of SDK and folder stucture. 
+There can by issues of different version of SDK and folder structure. 
 Project uses version 4.2 of the SDK.
 
 Install Jlink drivers.
-Connect board to Jlink using SWD lines (SWDCK,SWDIO) and power: GMD. +3v3. 
-Vref of Jlink conncet to +3v3 by 10KOm pull up resistor.
+Connect board to Jlink using SWD lines (SWDCK,SWDIO) and power: GND, +3v3. 
+Vref of Jlink connect to +3v3 by 10KOm pull up resistor.
 
 Compiling:
 cd ~/Projects/nrf51-pure-gcc-setup/examples/pca10001/lbs/pure_gcc
