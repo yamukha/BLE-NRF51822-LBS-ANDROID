@@ -43,6 +43,7 @@ in Linux PC at home folder create new folder Project
 ~/Project
 
 clone to it code from github, there are 3 folders: AndroidBLElbs  nrf51  nrf51-pure-gcc-setup
+
 - AndroidBLElbs: Android Eclipse project
 - nfr51: SDK for SoC
 - nrf51-pure-gcc-setup : with gcc make and flash scripts as well as with lbs code
@@ -52,10 +53,13 @@ There can by issues of different version of SDK and folder structure.
 Project uses version 4.2 of the SDK.
 
 Install Jlink drivers.
+
 Connect board to Jlink using SWD lines (SWDCK,SWDIO) and power: GND, +3v3. 
+
 Vref of Jlink connect to +3v3 by 10KOm pull up resistor.
 
 Compiling:
+
 cd ~/Projects/nrf51-pure-gcc-setup/examples/pca10001/lbs/pure_gcc
 
 make
@@ -71,11 +75,13 @@ cd ../../../../template
 make flash-softdevice SOFTDEVICE=s110_nrf51822_5.1.0_softdevice.hex
 
 2) building Android apk
+
 in Eclipse: File->New ->Project->Android Project from existing code -> Next ...
 select directory to import project from /home/amukha/Projects/AndroidBLElbs
 clean, build and run it over adb or install apk directly on Android device and run it.
 
 Logging: 
+
 To lbs nrf project added simple uart functions to log over serial port. 
 You can monitor messages from board over picocom or putty using ttyS or ttyUSB, i.e.: 
 sudo picocom -b 38400 -r -l /dev/ttyUSB0
