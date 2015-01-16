@@ -1,0 +1,7 @@
+w4 4001e504 1
+loadbin "_build/s110_nrf51822_5.1.0_softdevice_mainpart.bin" 0
+loadbin "_build/s110_nrf51822_5.1.0_softdevice_uicr.bin" 0x10001000
+loadbin "_build/app_s110.bin" 0x14000
+r
+g
+exit
