@@ -282,37 +282,7 @@ public class BleWrapper {
             strValue = String.valueOf(intValue);
             Log.d(TAG, "LBS LED =" + strValue);        
         }
-            
-        else         
-        if(uuid.equals(BleDefinedUUIDs.Characteristic.HEART_RATE_MEASUREMENT)) { // heart rate           
-        	// follow https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml
-        	// first check format used by the device - it is specified in bit 0 and tells us if we should ask for index 1 (and uint8) or index 2 (and uint16)
-        	int index = ((rawValue[0] & 0x01) == 1) ? 2 : 1;
-        	// also we need to define format
-        	int format = (index == 1) ? BluetoothGattCharacteristic.FORMAT_UINT8 : BluetoothGattCharacteristic.FORMAT_UINT16;
-        	// now we have everything, get the value
-        	intValue = ch.getIntValue(format, index);
-        	strValue = intValue + " bpm"; // it is always in bpm units
-        }
-        else if (uuid.equals(BleDefinedUUIDs.Characteristic.HEART_RATE_MEASUREMENT) || // manufacturer name string
-        		 uuid.equals(BleDefinedUUIDs.Characteristic.MODEL_NUMBER_STRING) || // model number string)
-        		 uuid.equals(BleDefinedUUIDs.Characteristic.FIRMWARE_REVISION_STRING)) // firmware revision string
-        {
-        	// follow https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.manufacturer_name_string.xml etc.
-        	// string value are usually simple utf8s string at index 0
-        	strValue = ch.getStringValue(0);
-        }
-        else if(uuid.equals(BleDefinedUUIDs.Characteristic.APPEARANCE)) { // appearance
-        	// follow: https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml
-        	intValue  = (rawValue[1]) << 8;
-        	intValue += rawValue[0];
-        	strValue = BleNamesResolver.resolveAppearance(intValue);
-        }
-        else if(uuid.equals(BleDefinedUUIDs.Characteristic.BODY_SENSOR_LOCATION)) { // body sensor location
-        	// follow: https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml
-        	intValue = rawValue[0];
-        	strValue = BleNamesResolver.resolveHeartRateSensorLocation(intValue);
-        }
+       
         else if(uuid.equals(BleDefinedUUIDs.Characteristic.BATTERY_LEVEL)) { // battery level
         	// follow: https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.battery_level.xml
         	intValue = rawValue[0];
@@ -411,9 +381,10 @@ public class BleWrapper {
         	Log.e(TAG, "Seting proper notification status for characteristic failed!");
         }
         
-        // This is also sometimes required (e.g. for heart rate monitors) to enable notifications/indications
-        // see: https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
-        BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));
+     // This is also sometimes required (e.g. for heart rate monitors) to enable notifications/indications
+     // see: https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
+     // BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));  
+        BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-1212-efde-1525-785feabcd123")); 
         if(descriptor != null) {
         	byte[] val = enabled ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
 	        descriptor.setValue(val);
@@ -525,7 +496,7 @@ public class BleWrapper {
         		 mUiCallback.uiSuccessfulWrite(mBluetoothGatt, mBluetoothDevice, mBluetoothSelectedService, descriptor.getCharacteristic(), description);
         	}
         	else {
-        		 mUiCallback.uiFailedWrite(mBluetoothGatt, mBluetoothDevice, mBluetoothSelectedService, descriptor.getCharacteristic(), description + " STATUS = " + status);
+        		 mUiCallback.uiFailedWrite(mBluetoothGatt, mBluetoothDevice, mBluetoothSelectedService, descriptor.getCharacteristic(), description + "uiFailedWrite() STATUS = " + status);
         	}
         };       
     };

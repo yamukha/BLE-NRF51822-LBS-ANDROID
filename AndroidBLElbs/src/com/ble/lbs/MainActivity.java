@@ -29,6 +29,12 @@ public class MainActivity extends Activity
     private mSensorState mState;
     private String gattList = "";
     private TextView mTv;
+    private boolean mScanning = false;
+    private boolean mCreated = false;
+        
+    private UUID lbsSrv = Characteristic.LBS;
+    private UUID lbsButton = Characteristic.LBS_BUTTON;
+    private UUID lbsLED = Characteristic.LBS_LED;;
 
     private enum mSensorState {IDLE, ACC_ENABLE, ACC_READ};
    
@@ -78,16 +84,14 @@ public class MainActivity extends Activity
 
                     mBleWrapper.getCharacteristicsForService(service);
                 }
-
-                UUID lbsSrv = Characteristic.LBS;
-                UUID lbsButton = Characteristic.LBS_BUTTON;
-                UUID lbsLED = Characteristic.LBS_LED;;
+            
 
                 Log.d(LOGTAG, "Writing Button/LED");
-                //c = gatt.getService(lbsSrv).getCharacteristic(lbsButton);
-                c = gatt.getService(lbsSrv).getCharacteristic(lbsLED);
+                c = gatt.getService(lbsSrv).getCharacteristic(lbsButton);
+                //c = gatt.getService(lbsSrv).getCharacteristic(lbsLED);
                 //mBleWrapper.writeDataToCharacteristic(c, new byte[] { 0x00 }); //0x01
-                mBleWrapper.requestCharacteristicValue(c);
+                //mBleWrapper.requestCharacteristicValue(c);
+                mBleWrapper.setNotificationForCharacteristic(c, true);
             }
 
             @Override
@@ -168,6 +172,26 @@ public class MainActivity extends Activity
                                                     int intValue, 
                                                     byte[] rawValue, 
                                                     String timestamp) 
+            
+//          {   
+//          runOnUiThread(new Runnable() {
+//              @Override
+//              public void run() {                 
+//                 
+//                  
+//                  UUID uuid = ch.getUuid();                
+//                  
+//                  if (uuid.equals(Characteristic.LBS_LED)) {
+//                      //mLedValue = (TextView) findViewById(R.id.led_characteristic_value);
+//                      //mLedValue.setText(((rawValue[0] & 0x01) == 1) ? "on" : "off");
+//                  }
+//                  else if (uuid.equals(Characteristic.LBS_LED)) {
+//                      //mButtonValue = (TextView) findViewById(R.id.button_characteristics_value);
+//                      // mButtonValue.setText(((rawValue[0] & 0x01) == 1) ? "pressed" : "released");
+//                  }   
+//              }
+//          };
+            
             {
                 super.uiNewValueForCharacteristic(gatt, device, service, ch, strValue, intValue, rawValue, timestamp);
                 Log.d(LOGTAG, "uiNewValueForCharacteristic");
@@ -194,13 +218,14 @@ public class MainActivity extends Activity
                 Log.d(LOGTAG,  "uiGotNotification: " + ch);
             }
         });
-
+        Log.d(LOGTAG, "created");
         // check for BLE
         if (mBleWrapper.checkBleHardwareAvailable() == false)
         {
             Toast.makeText(this, "BLE Hardware missing", Toast.LENGTH_SHORT).show();
             finish();
         }
+      
     }
 
     @Override
@@ -215,18 +240,59 @@ public class MainActivity extends Activity
             startActivity(enableBtIntent);
             finish();
         }
+         // init ble wrapper
+        // if (mScanning == false)
+        if (!mCreated){
+           mBleWrapper.initialize();
+           mCreated = true;
+        }   
 
-        // init ble wrapper
-        mBleWrapper.initialize();
+        if (mBleWrapper.isConnected() == true && mScanning == true) {
+            Log.d(LOGTAG, "resumed at connected state");
+            mScanning = true;
+            return;
+        }
+        
+        if (mScanning == true && mBleWrapper.isConnected() == false)
+        {    
+            mBleWrapper.stopScanning();                
+            mBleWrapper.startScanning();
+            mScanning = true;
+            Log.d(LOGTAG, "resumed at disconnceted state");
+            return;
+        }          
+       
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mBleWrapper.diconnect();
-        mBleWrapper.close();
+        Log.d(LOGTAG, "paused");  
     }
-
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOGTAG, "stoped");
+        if (super.isFinishing()) 
+        {
+            if (mBleWrapper.isConnected())
+                mBleWrapper.diconnect();
+            if  (mScanning == true )
+                mBleWrapper.stopScanning();
+            
+            mBleWrapper.close();
+            mScanning = false;                 
+            Log.d(LOGTAG, "destroyed");
+        }        
+    }
+    @Override
+    protected void onRestart()
+    {
+        super.onRestart();
+        Log.d(LOGTAG, "restarted");
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -257,16 +323,33 @@ public class MainActivity extends Activity
     // start the BLE scan
     public void startScan()
     {
-        Log.d(LOGTAG, "startScan");
-        mBleWrapper.startScanning();
+        Log.d(LOGTAG, "start Scan");
+        if (mScanning) {
+            Toast.makeText(this, "Scan already started", Toast.LENGTH_SHORT).show();
+            return;
+        }    
+        
+        if (!mBleWrapper.isConnected()) {
+            mBleWrapper.startScanning();
+            Toast.makeText(this, "Scan started", Toast.LENGTH_SHORT).show();
+            mScanning = true;            
+        } 
     }
 
     // stop the BLE scan
     private void stopScan()
     {
-        Log.d(LOGTAG, "stopSCan");
-        mBleWrapper.stopScanning();
-        Toast.makeText(this, "Scan finished", Toast.LENGTH_SHORT).show();
+        if (mScanning == false) {
+            Toast.makeText(this, "Scan already stopped", Toast.LENGTH_SHORT).show();
+            return;
+        }    
+        else  {      
+           if (mBleWrapper.isConnected())
+               mBleWrapper.diconnect();
+           mBleWrapper.stopScanning();
+           Toast.makeText(this, "Scan finished", Toast.LENGTH_SHORT).show();
+        }       
+        mScanning = false;
     }
 
     private void testButton()
@@ -275,13 +358,10 @@ public class MainActivity extends Activity
         BluetoothGattCharacteristic c;
 
         if (!mBleWrapper.isConnected()) {
+            Toast.makeText(this, "not connected", Toast.LENGTH_SHORT).show();
             return;
         }
-                       
-        UUID lbsSrv =  Characteristic.LBS;
-        UUID lbsLED = Characteristic.LBS_LED;
-        UUID lbsButton = Characteristic.LBS_BUTTON ;
-        
+           
         gatt = mBleWrapper.getGatt();
         //c = gatt.getService(lbsSrv).getCharacteristic(lbsButton);
         c = gatt.getService(lbsSrv).getCharacteristic(lbsLED);
@@ -291,5 +371,6 @@ public class MainActivity extends Activity
         //		if (c.getValue()!= null) {
         //			Log.d(LOGTAG, "testButton: " + c.getValue()[0]);
         //		}
+        Toast.makeText(this, "try data with BLE device", Toast.LENGTH_SHORT).show();
     }
 }

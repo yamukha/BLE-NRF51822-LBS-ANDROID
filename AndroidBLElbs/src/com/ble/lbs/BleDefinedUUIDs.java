@@ -10,9 +10,10 @@ public class BleDefinedUUIDs {
 	};
 	
 	public static class LbsStrings {
-        final static public String Lbs       = "00001523-1212-efde-1523-785feabcd123";
-        final static public String LbsButton = "00001524-1212-efde-1523-785feabcd123";
-        final static public String LbsLed    = "00001525-1212-efde-1523-785feabcd123";
+        final static public String Lbs             = "00001523-1212-efde-1523-785feabcd123";
+        final static public String LbsButton       = "00001524-1212-efde-1523-785feabcd123";
+        final static public String LbsLed          = "00001525-1212-efde-1523-785feabcd123";
+        final static public String LbsLedNotify    = "00002902-1212-efde-1523-785feabcd123";
     };
 	
 	public static class Characteristic {
