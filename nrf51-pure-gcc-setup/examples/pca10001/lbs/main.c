@@ -90,10 +90,9 @@ typedef enum addr_type_e {
 } addr_type_t;
 
 #define	MSEC_TO_UNITS(TIME, RESOLUTION)   (((TIME) * 1000) / (RESOLUTION))
-
-#define MIN_CONN_INTERVAL MSEC_TO_UNITS(500, UNIT_1_25_MS) /**< Minimum acceptable connection interval (0.5 seconds). */
+#define MIN_CONN_INTERVAL MSEC_TO_UNITS(7.5, UNIT_1_25_MS) 
 #define MAX_CONN_INTERVAL MSEC_TO_UNITS(1000, UNIT_1_25_MS) /**< Maximum acceptable connection interval (1 second). */
-#define SLAVE_LATENCY 0 /**< Slave latency. */
+#define SLAVE_LATENCY 3 /**< Slave latency. */
 #define CONN_SUP_TIMEOUT MSEC_TO_UNITS(4000, UNIT_10_MS) /**< Connection supervisory timeout (4 seconds). */
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(20000, APP_TIMER_PRESCALER) /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (15 seconds). */
@@ -287,6 +286,7 @@ static void sec_params_init(void) {
  */
 static void on_conn_params_evt(ble_conn_params_evt_t * p_evt) {
 	uint32_t err_code;
+        uart_tx_status_code("on_conn_params_evt() evt_type:", p_evt->evt_type, 0);
 	if (p_evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED) {
 		err_code = sd_ble_gap_disconnect(m_conn_handle,
 				BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
@@ -460,6 +460,8 @@ static void button_event_handler(uint8_t pin_no) {
 //err_code = NRF_SUCCESS;
 		if (err_code != NRF_SUCCESS && err_code != BLE_ERROR_INVALID_CONN_HANDLE
 				&& err_code != NRF_ERROR_INVALID_STATE) {
+                        uart_tx_status_code("reset @ err. code #:", err_code, 0);
+                        err_code = sd_power_system_off();
 			APP_ERROR_CHECK(err_code);
 		}
 		send_push = !send_push;
@@ -476,7 +478,7 @@ static void buttons_init(void) {
 // module.
 	static app_button_cfg_t buttons[] = { { WAKEUP_BUTTON_PIN, false,
 			NRF_GPIO_PIN_PULLUP, NULL }, { LEDBUTTON_BUTTON_PIN_NO, false,
-			NRF_GPIO_PIN_NOPULL, button_event_handler } };
+			NRF_GPIO_PIN_PULLUP, button_event_handler } };
 	APP_BUTTON_INIT(buttons, sizeof(buttons) / sizeof(buttons[0]),
 			BUTTON_DETECTION_DELAY, true);
 }
@@ -505,7 +507,7 @@ int main(void) {
 	conn_params_init();
 	sec_params_init();
 // Start execution
-	app_button_enable();
+	//app_button_enable();
 	advertising_start();
 	uart_tx_str("nRF51822 run");
 

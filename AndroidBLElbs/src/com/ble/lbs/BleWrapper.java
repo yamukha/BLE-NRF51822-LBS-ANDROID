@@ -383,8 +383,8 @@ public class BleWrapper {
         
      // This is also sometimes required (e.g. for heart rate monitors) to enable notifications/indications
      // see: https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml
-     // BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));  
-        BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-1212-efde-1525-785feabcd123")); 
+      BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"));  
+     // BluetoothGattDescriptor descriptor = ch.getDescriptor(UUID.fromString("00002902-1212-efde-1523-785feabcd123"));  // LbsLedNotify 
         if(descriptor != null) {
         	byte[] val = enabled ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE;
 	        descriptor.setValue(val);

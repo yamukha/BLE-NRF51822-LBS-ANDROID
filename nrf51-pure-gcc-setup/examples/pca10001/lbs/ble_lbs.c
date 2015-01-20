@@ -46,22 +46,19 @@ static void on_disconnect(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt) {
 static void on_write(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt) {
 
 	ble_gatts_evt_write_t * p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-//uart_tx_status_code ("BLE rx:",0);
-	if ((p_evt_write->len > 0))
-		uart_tx_status_code("BLE rx bytes:", p_evt_write->len, 0);
 
-// for LED
+        // for LED
 	if ((p_evt_write->handle == p_lbs->led_char_handles.value_handle)
 			&& (p_evt_write->len == 1) && (p_lbs->led_write_handler != NULL)) {
 		p_lbs->led_write_handler(p_lbs, p_evt_write->data[0]);
 		uart_tx_hex(p_evt_write->data[0]);
 	}
-// TODO for button
-//if ((p_evt_write->handle == p_lbs->led_char_handles.value_handle) && (p_evt_write->len == 1) && (p_lbs->led_write_handler != NULL))
-//{
-//p_lbs->led_write_handler(p_lbs, p_evt_write->data[0]);
-//uart_tx_hex (p_evt_write->data[0]);
-//}
+        else if ((p_evt_write->len > 0)) 
+        {
+		uart_tx_status_code("BLE rx bytes:", p_evt_write->len, 0);
+                uart_tx_hex_buffer ((char *) p_evt_write->data, p_evt_write->len);
+        }
+     
 }
 
 void ble_lbs_on_ble_evt(ble_lbs_t * p_lbs, ble_evt_t * p_ble_evt) {
@@ -125,7 +122,7 @@ static uint32_t led_char_add(ble_lbs_t * p_lbs,
 	attr_char_value.init_len = sizeof(uint8_t);
 	attr_char_value.init_offs = 0;
 	attr_char_value.max_len = sizeof(uint8_t);
-//attr_char_value.p_value = NULL;  
+        //attr_char_value.p_value = NULL;  
 	attr_char_value.p_value = &init_led_value;
 
 	return sd_ble_gatts_characteristic_add(p_lbs->service_handle, &char_md,
@@ -155,7 +152,7 @@ static uint32_t button_char_add(ble_lbs_t * p_lbs,
 	memset(&char_md, 0, sizeof(char_md));
 	char_md.char_props.read = 1;
 	char_md.char_props.notify = 1;
-//char_md.char_props.write = 1;
+        char_md.char_props.write = 1;
 	char_md.p_char_user_desc = NULL;
 	char_md.p_char_pf = NULL;
 	char_md.p_user_desc_md = NULL;
@@ -218,6 +215,7 @@ uint32_t ble_lbs_init(ble_lbs_t * p_lbs, const ble_lbs_init_t * p_lbs_init) {
 }
 
 uint32_t ble_lbs_on_button_change(ble_lbs_t * p_lbs, uint8_t button_state) {
+        nrf_gpio_pin_clear(LEDBUTTON_LED_PIN_NO);
 	ble_gatts_hvx_params_t params;
 	uint16_t len = sizeof(button_state);
 	memset(&params, 0, sizeof(params));

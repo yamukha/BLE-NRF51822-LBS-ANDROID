@@ -91,6 +91,10 @@ You can monitor messages from board over picocom or putty using ttyS or ttyUSB, 
 
 sudo picocom -b 38400 -r -l /dev/ttyUSB0
 
+Controlling:
+
+After established connection go to Andoid app at right upper corner tap dropping menu and tap "Test" item
+It schould off LED. Pressing button on board light on this LED and sends notificaion to Android.
 
 update: 
 

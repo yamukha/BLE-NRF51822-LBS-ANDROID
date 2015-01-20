@@ -72,4 +72,16 @@ static void uart_tx_status_code(char * str, int i, char hexmode) {
 	simple_uart_putstring(bufi);
 }
 
+static void uart_tx_hex_buffer(char * ch, int len ) {
+        uint32_t i;
+        unsigned char bufi[4];
+        for   (i = 0; i < len; i++)
+        {
+	if (ch < 0)
+		ch += 128;
+	sprintf((char*) bufi, "%x ", ch[i]);
+	simple_uart_putstring(bufi);
+       }
+}
+
 #endif 

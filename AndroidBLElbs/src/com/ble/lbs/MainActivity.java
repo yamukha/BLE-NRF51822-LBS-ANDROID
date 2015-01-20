@@ -42,7 +42,8 @@ public class MainActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        final TextView mTextView = (TextView) findViewById(R.id. textView1);
+       
         mBleWrapper = new BleWrapper(this, new BleWrapperUiCallbacks.Null()
         {
             @Override
@@ -53,9 +54,16 @@ public class MainActivity extends Activity
                 if (device.getName().equals ("LedButtonDemo"))
                 {
                     if (!mBleWrapper.connect(device.getAddress()))
-                    {
+                    {                        
                         Log.d(LOGTAG, "uiDeviceFound: Problem connecting to remote device.");
                     }
+                    else
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mTextView.setText("LedButtonDemo found");
+                            }
+                        });     
                 }
             }
 
@@ -63,12 +71,25 @@ public class MainActivity extends Activity
             public void uiDeviceConnected(BluetoothGatt gatt, BluetoothDevice device) 
             {
                 Log.d(LOGTAG, "uiDeviceConnected: State = " + mBleWrapper.getAdapter().getState());
+              // mTextView.setText("Connected");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTextView.setText("Connected");
+                    }
+                });     
             }
 
             @Override
             public void uiDeviceDisconnected(BluetoothGatt gatt, BluetoothDevice device) {
-                Log.d(LOGTAG, "uiDeviceDisconnected: State = " + mBleWrapper.getAdapter().getState());
+                Log.d(LOGTAG, "uiDeviceDisconnected: State = " + mBleWrapper.getAdapter().getState());              
                 gatt.disconnect();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTextView.setText("Disconnected");
+                    }
+                });     
             }
 
             @Override
@@ -81,17 +102,18 @@ public class MainActivity extends Activity
                     String serviceName = BleNamesResolver.resolveUuid(service.getUuid().toString());
                     Log.d(LOGTAG, "serviceName = " + serviceName);
                     gattList += serviceName + "\n";
-
-                    mBleWrapper.getCharacteristicsForService(service);
+                    if (serviceName.contains (TARGET)) 
+                        mBleWrapper.getCharacteristicsForService(service);                    
                 }
-            
-
+                             
+                c = null;
                 Log.d(LOGTAG, "Writing Button/LED");
                 c = gatt.getService(lbsSrv).getCharacteristic(lbsButton);
                 //c = gatt.getService(lbsSrv).getCharacteristic(lbsLED);
                 //mBleWrapper.writeDataToCharacteristic(c, new byte[] { 0x00 }); //0x01
-                //mBleWrapper.requestCharacteristicValue(c);
-                mBleWrapper.setNotificationForCharacteristic(c, true);
+                // mBleWrapper.requestCharacteristicValue(c);
+                if (c != null)
+                    mBleWrapper.setNotificationForCharacteristic(c, true);
             }
 
             @Override
@@ -194,7 +216,8 @@ public class MainActivity extends Activity
             
             {
                 super.uiNewValueForCharacteristic(gatt, device, service, ch, strValue, intValue, rawValue, timestamp);
-                Log.d(LOGTAG, "uiNewValueForCharacteristic");
+                String chr = BleNamesResolver.resolveCharacteristicName(ch.getUuid().toString());
+                Log.d(LOGTAG, "uiNewValueForCharacteristic at " + chr);
                 if ( null !=rawValue && rawValue.length > 0 )
                 {    
                     for (byte b : rawValue) {
@@ -211,11 +234,17 @@ public class MainActivity extends Activity
                     BluetoothGattService service,
                     BluetoothGattCharacteristic characteristic) 
             {
-                Log.d(LOGTAG,  "uiGotNotification: ");
                 super.uiGotNotification(gatt, device, service, characteristic);                
                 String ch = BleNamesResolver.resolveCharacteristicName(characteristic.getUuid().toString());
 
                 Log.d(LOGTAG,  "uiGotNotification: " + ch);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTextView.setText("Button pressed");
+                    }
+                });    
+                
             }
         });
         Log.d(LOGTAG, "created");

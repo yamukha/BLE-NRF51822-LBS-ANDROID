@@ -13,9 +13,10 @@ public class BleDefinedUUIDs {
         final static public String Lbs             = "00001523-1212-efde-1523-785feabcd123";
         final static public String LbsButton       = "00001524-1212-efde-1523-785feabcd123";
         final static public String LbsLed          = "00001525-1212-efde-1523-785feabcd123";
-        final static public String LbsLedNotify    = "00002902-1212-efde-1523-785feabcd123";
-    };
-	
+      //  final static public String LbsLedNotify    = "00002902-1212-efde-1523-785feabcd123";
+        final static public String LbsLedNotify    = "00002902-0000-1000-8000-00805f9b34fb";
+    };   
+    
 	public static class Characteristic {
 		final static public UUID HEART_RATE_MEASUREMENT   = UUID.fromString("00002a37-0000-1000-8000-00805f9b34fb");
 		final static public UUID MANUFACTURER_STRING      = UUID.fromString("00002a29-0000-1000-8000-00805f9b34fb");
